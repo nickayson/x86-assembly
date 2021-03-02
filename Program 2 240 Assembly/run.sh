@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Program: Perimeter
+#Program: root
 #Author: Nicholas Ayson
 
 #Delete some un-needed files
@@ -11,10 +11,10 @@ echo "Assemble Quadratic.asm"
 nasm -f elf64 -l Quadratic.lis -o Quadratic.o Quadratic.asm
 
 echo "Compile Quad_library.cpp using g++ compiler standard 2011"
-g++ -c -m64 -Wall -fno-pie -no-pie -o Quad_library.o Quad_library.cpp -std=c++17
+g++ -c -m64 -Wall -no-pie -o Quad_library.o Quad_library.cpp -std=c++17
 
 echo "Compile isfloat.cpp using g++ compiler standard 2011"
-g++ -c -m64 -Wall -fno-pie -no-pie -o isfloat.o isfloat.cpp -std=c++17
+g++ -c -m64 -Wall -no-pie -o isfloat.o isfloat.cpp -std=c++17
 
 echo "Compile Second_degree.c using gcc compiler standard 2011"
 gcc -c -Wall -m64 -no-pie -o Second_degree.o Second_degree.c -std=c11

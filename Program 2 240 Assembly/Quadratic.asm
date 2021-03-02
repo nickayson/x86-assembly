@@ -28,7 +28,7 @@
  ;   Language: x86 assembly
  ;   Max page width: 304 columns
  ;   Assemble: nasm -f elf64 -l Quadratic.lis -o Quadratic.o Quadratic.asm
-     Link:g++ -m64 -fno-pie -no-pie -o a.out -std=c++17 Quad_library.o isfloat.o Second_degree.o Quadratic.o
+  ;   Link:g++ -m64 -fno-pie -no-pie -o a.out -std=c++17 Quad_library.o isfloat.o Second_degree.o Quadratic.o
 
 ;=======1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
 
@@ -45,17 +45,14 @@ global root
 
 segment .data
 
-invalidmessage db "Invalid input data detected. You may run this program again." ,10 ,0
+invalid db "Invalid input data detected. You may run this program again" ,10 ,0
 
 welcome db "This program will find the roots of any quadratic equation",10,0
 
-prompt1 db "Please enter the three floating point coefficients of a quadratic equation in the order a, b ,c. Number 1: ",0
-prompt2 db "Number 2: ", 0
-prompt3 db "Number 3: ", 0
-onestring db "%s", 0
-twostring db "%s", 0
-threestring db "%s", 0
-equationprompt db "Thank you the equation is %5.6lf x^2 + %5.6lf x + %5.6lf = 0.0", 10, 0
+prompt1 db "Please enter the three floating point coefficients of a quadratic equation in the order a, b ,c. ",0
+
+string db "%s%s%s", 0
+equationprompt db "Thank you the equation is %5.20lf x^2 + %5.20lf x + %5.20lf = 0.0",10, 0
 
 good_bye1 db "One of these roots will be returned to the caller function.",10,0
 
@@ -88,9 +85,11 @@ pushf
 push qword 0
 
 ;Display a welcome message to the viewer.
+push qword 0
 mov rax, 0
 mov rdi, welcome
 call printf
+pop rax
 
 
 ;============= Begin section to input 3 numbers========================================================
@@ -100,93 +99,59 @@ mov rax, 0
 mov rdi, prompt1        ;Please enter the three floating point coefficients of a quadratic equation in the order a, b, c
 call printf
 pop rax
-;==========================================================================================================
-;Begin the scanf
-push qword 0
+
+sub rsp, 1560
+;scanf block
 mov rax, 0
-mov rdi, onestring
-sub rsp, 1024
-mov rsi, rsp           ;rsi to first quadword of stack
+mov rdi, string       ;"%s%s%s"
+mov rsi, rsp
+mov rdx, rsp
+add rdx, 520
+mov rcx, rsp
+add rcx, 1040
 call scanf
 
-
-;isfloat block / validate number
+;everything works need to figure out how to implement isfloat
 mov rax, 0
 mov rdi, rsp
-call isfloat
+call isfloat      ;answer is in rax
 
 cmp rax, 0
-je invalidroot
+jmp valid
+je invalidmes       ;strangely won't output regular floats if invalid is put in front
 
-mov rax, 0
+valid:
 mov rdi, rsp
 call atof
-pop rax
-movsd xmm15, [rsp]
-;===============================================================================================================
-;Display a prompt message asking for inputs
+movsd xmm15, xmm0
+
+mov rdi, rsp
+add rdi, 520
+call atof
+movsd xmm14, xmm0
+
+mov rdi , rsp
+add rdi, 1040
+call atof
+movsd xmm13, xmm0
+
+add rsp, 1560
+jmp over
+
+invalidmes:
 push qword 0
 mov rax, 0
-mov rdi, prompt2        ;Please enter the three floating point coefficients of a quadratic equation in the order a, b, c
+mov rdi, invalid
 call printf
 pop rax
+add rsp, 1560
+jmp exit
 
-;Begin the scanf
-push qword 0
-mov rax, 0
-mov rdi, onestring
-sub rsp, 1024
-mov rsi, rsp           ;rsi to first quadword of stack
-call scanf
 
-;isfloat block / validate number
-mov rax, 0
-mov rdi, rsp
-call isfloat
 
-cmp rax, 0
-je invalidroot
-
-;atof block
-mov rax, 0
-mov rdi, rsp
-call atof
-pop rax
-movsd xmm14, [rsp]
-
-;================================================================================================================================
-;Display a prompt message asking for inputs
-push qword 0
-mov rax, 0
-mov rdi, prompt2        ;Please enter the three floating point coefficients of a quadratic equation in the order a, b, c
-call printf
-pop rax
-
-;Begin the scanf
-push qword 0
-mov rax, 0
-mov rdi, onestring
-mov rsi, rsp           ;rsi to first quadword of stack
-call scanf
-
-;isfloat block / validate number
-mov rax, 0
-mov rdi, rsp
-call isfloat
-cmp rax, 0
-je invalidroot
-
-;atof block
-mov rax, 0
-mov rdi, rsp
-call atof
-pop rax
-movsd xmm13, [rsp]
-
-;========================================================================================================================
-
+over:
 ;display the numbers
-push qword 0
+push qword 99
 mov rax, 3
 mov rdi, equationprompt
 movsd xmm0, xmm15
@@ -197,6 +162,7 @@ pop rax
 
 
 ;============= End of section to input 3 numbers ===============================================================
+
 ;=============Begin section finding roots ==================================================
 push qword 0
 mov rax, 0
@@ -223,7 +189,9 @@ mulsd xmm14, xmm14        ;xmm14 = xmm14 *xmm14 = b^2
 mulsd xmm12, xmm15        ;xmm12=4*xmm13
 mulsd xmm12, xmm13        ;4*a*c
 subsd xmm14, xmm12       ;b^2-4ac
+sqrtsd xmm14, xmm0
 movsd xmm9, xmm14         ;xmm9 == b^2-4ac
+
 
 ;1st root
 mulsd xmm8, xmm6    ;b*-1
@@ -231,6 +199,7 @@ subsd xmm8, xmm9      ;-b - b^2-4ac
 mulsd xmm11, xmm15   ;2a
 divsd xmm8, xmm11     ;-b - b^2-4ac/2a
 movsd xmm15, xmm8     ;xmm15 =-b - b^2-4ac/2a
+
 ;second root
 mulsd xmm7, xmm6    ;-b
 addsd xmm7, xmm14   ;-b + b^2-4ac
@@ -240,46 +209,48 @@ pop rax
 
 ucomisd xmm14, xmm10
 ja tworoot
-
-;if b^2-4ac is less than 0
-call show_no_root
+je oneroot
+jb noroot
 
 tworoot:
+  push qword 0
   mov rax, 2
   movsd xmm0, xmm8
   movsd xmm1, xmm7
   call show_two_root
+  pop rax
   jmp exit
 
-je oneroot
-call show_no_root
-
 oneroot:
+  push qword 0
   mov rax, 1
   movsd xmm0, xmm8
   call show_one_root
+  pop rax
   jmp exit
+
+noroot:
+  push qword 0
+  call show_no_root
+  pop rax
+  jmp exit
+
 
 ;============= Prepare to exit from this program ======================================================================
 
-invalidroot:
-  mov rax, 0
-  mov rdi, onestring
-  mov rsi, invalidmessage
-  call printf
-  jmp exit
-
+exit:
 
 ;Display good-bye message
+push qword 0
 mov rax, 0
 mov rdi, good_bye1
 call printf
+pop rax
 
 pop rax     ;to 1st push
 
-movsd xmm0, xmm15            ;perimeter value to return to the main
+movsd xmm0, xmm15          ;perimeter value to return to the main
 
-exit:
 ;===== Restore original values to integer registers ===================================================================
 popf                                                        ;Restore rflags
 pop rbx                                                     ;Restore rbx
