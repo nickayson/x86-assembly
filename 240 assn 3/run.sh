@@ -1,3 +1,9 @@
+#program: Sum of Floats-Array
+#Author Nicholas Ayson
+
+
+
+
 #Delete some un-needed files
 rm *.o
 rm *.out
