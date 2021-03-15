@@ -1,73 +1,73 @@
- ;****************************************************************************************************************************
- ;Program name: "root".  This program demonstrates the input of 3 numbers and using them            *
- ;to calculate the roots of a quadratic formula. Copyright (C) 2021 Nicholas Ayson.                                                                           *
- ;                                                                                                                           *
- ;This file is part of the software program "root".                                                                   *
- ;root is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License   *
- ;version 3 as published by the Free Software Foundation.                                                                    *
- ;Perimeter is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied          *
- ;warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.     *
- ;A copy of the GNU General Public License v3 is available here:  <https:;www.gnu.org/licenses/>.                            *
- ;****************************************************************************************************************************
+//********************************************************************************************
+//Program name:          Sum of Floats - Array                                              *
+//Programming Language:  x86 Assembly                                                       *
+//Program Description:   This program asks a user to input doubles into an array and        *
+//                       returns the sum of doubles in the array.                           *
+// Built on: Tuffix 2020
+//                                                                                            *
+// ********************************************************************************************
+//  Author Information:                                                                       *
+//  Name:         Nicholas Ayson                                                              *
+//  Email:        nick.ayson@csu.fullerton.edu                                                *
+//  Institution:  California State University - Fullerton                                     *
+//  Course:       CPSC 240-05 Assembly Language                                               *
+//                                                                                            *
+// ********************************************************************************************
+//  Copyright (C) 2020 Nicholas Ayson                                                         *
+//  This program is free software: you can redistribute it and/or modify it under the terms   *
+//  of the GNU General Public License version 3 as published by the Free Software Foundation. *
+//  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY  *
+//  without even the implied Warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. *
+//  See the GNU General Public License for more details. A copy of the GNU General Public     *
+//  License v3 is available here:  <https://www.gnu.org/licenses/>.                           *
+//                                                                                            *
+// ********************************************************************************************
+//  Program information                                                                       *
+//    Program name: Sum of Floats - Array                                                     *
+//    Programming languages: One module in C, Three modules in X86, One modules in c++        *
+//    Files in this program: control.asm, Fill.asm, Sum.asm, main.c, Display.cpp              *
+//                                                                                            *
+// ********************************************************************************************
+//  This File                                                                                 *
+//     Name:     control.asm                                                                  *
+//     Purpose:   Manages all the files in the program and calls fill, sum and Display as needed*
+//                                                                                            *
+// ********************************************************************************************
 
- ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
- ;
- ;Author information
- ;  Author name: Nicholas Ayson
- ;  Author email: nick.ayson@csu.fullerton.edu
- ;
-;Program information
- ;  Program name: root
- ;  Programming languages: Two modules in c++ One modules in C and one module in X86
- ;  Date program began: 2021-Feb-23
-;  Date of last update: 2021-Feb-28
-;  Files in this program: Second_degree.c, Quadratic.asm, isfloat.cpp, Quad_library.cpp
- ;
-;This file
- ;   File name: Quadratic.asm
- ;   Language: x86 assembly
- ;   Max page width: 304 columns
- ;   Assemble: nasm -f elf64 -l Quadratic.lis -o Quadratic.o Quadratic.asm
-;   Link:g++ -m64 -fno-pie -no-pie -o a.out -std=c++17 Quad_library.o isfloat.o Second_degree.o Quadratic.o
-
-;=======1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
 
 
 
-extern printf
-extern scanf
-extern fill
-extern display_array
-extern sum
-
-array_size equ 100        ; capacity limited to 100 in array
+max_array_size equ 20                           ;max array size is 20
 
 global control
 
+extern printf
+
+extern fill
+
+extern display_array
+
+extern sum
+
 segment .data
-
-floatformat db "%lf", 0
-stringformat db "%s", 0
-
 welcome db "Welcome to HSAS. The accuracy and reliability of this program is guaranteed by Nicholas Ayson.",10,0
 
-prompt1 db "The numbers you entered are these: ",10,0
+get_data db "The numbers you entered are these: ",10,0
 
-sumvalue db "The sum of these values is %5.8lf",10,0
+sum_info db "The sum of these values is %5.8lf",10,0
 
-controlexit db "The control module will now return the sum to the caller module.", 10, 0
-
+good_bye db "The control module will now return the sum to the caller module.", 10, 0
 
 
 segment .bss
 
-intarray: resq 100
+standard_array resq max_array_size
 
 segment .text
 
 control:
 
-;=============================================================================================
+;====================================================================================================
 push rbp
 mov  rbp,rsp
 push rdi                                                    ;Backup rdi
@@ -83,84 +83,62 @@ push r13                                                    ;Backup r13
 push r14                                                    ;Backup r14
 push r15                                                    ;Backup r15
 push rbx                                                    ;Backup rbx
-pushf
+pushf                                                       ;Backup rflags
 
 
-push qword 0
-
-;========================================Initialize=================================================================
-mov r14, 0                    ;register for number of elements in array
-mov r13, 0                    ;register for sum of floats in array
-;========================================================================================================================
-
-;Display welcome message
-push qword 0
+;Display a welcome message to the viewer.
 mov rax, 0
-mov rdi, welcome            ;"Welcome to HSAS. The accuracy and reliability of this program is guaranteed by Nicholas Ayson."
+mov rdi, welcome               ;"Welcome to HSAS. The accuracy and reliability of this program is guaranteed by Nicholas Ayson."
 call printf
-pop rax
-
-;========================================Function call to fill============================================================
-
-push qword 0
-mov rdi, intarray
-mov rsi, array_size
-mov rax, 0
+;==================================================Filling the array========================================
+;Begin preparation for calling input_array
+mov rax,0
+mov rdi, standard_array
+mov rsi, max_array_size
 call fill
-mov r14, rax          ; saves copy of fill array into r14
-pop rax
+;Save the returned integer in a stable register
+mov r13, rax
 
-;========================================Confirmation of inputs=====================================================
+;================================================Array Update==================================================
 
 push qword 0
-mov rdi, stringformat   ; change to float does not display
-mov rsi, prompt1        ;"The numbers you entered are these: "
 mov rax, 0
+mov rdi, get_data       ;"The numbers you entered are these: "
 call printf
 pop rax
 
-;========================================Display array=============================================================
-
-push qword 0
-mov rdi, intarray
-mov rsi, r14                            ;passes number of elements in array stored in r14
+;==============================================Display numbers in the array=====================================
+;Begin preparation for calling output_array
 mov rax, 0
-call display_array                        ;calls display
-pop rax
+mov rdi, standard_array
+mov rsi, r13             ;rsi receives the count of doubles in the array standard_array
+call display_array
 
-;================================================Call Sum================================================================
+;====================================== Calling Sum ============================================
+;Set up for the Sum function
+mov rax,0
+mov rdi, standard_array
+mov rsi,r13
+call sum
+movsd xmm15,xmm0                    ;An extra copy of the product number is kept in xmm15
 
- push qword 0
- mov rdi, intarray
- mov rsi, r14             ;passes number of elements in the array in r14
- mov rax, 0
- call sum                 ; call sum to add all floats in array
- mov r13, rax           ;saves copy of sum functions output into r13
- pop rax
-
-;=================================================Prints out Sum======================================================
-
-push qword 0
-mov rdi, sumvalue
-mov rdx, r13
-mov rax, 0
+;Show the sum
+mov rax,1
+mov rdi,sum_info
+movsd xmm0,xmm15
 call printf
-pop rax
 
-;=======================================================================================================================
+;==================================== Good bye ================================================
 
-push qword 0
+;Set up the good bye message
 mov rax, 0
-mov rdi, controlexit
+mov rdi, good_bye
 call printf
-pop rax
 
-pop rax
-mov rax, r13      ; copies sum r13 to rax
+;Send the product number to the caller of this function
+movsd xmm0, xmm15
 
-
-exit:
-;===== Restore original values to integer registers ===================================================================
+;===== Restore original values to integer registers ===============================================================================
 popf                                                        ;Restore rflags
 pop rbx                                                     ;Restore rbx
 pop r15                                                     ;Restore r15
@@ -176,7 +154,6 @@ pop rdx                                                     ;Restore rdx
 pop rsi                                                     ;Restore rsi
 pop rdi                                                     ;Restore rdi
 pop rbp                                                     ;Restore rbp
-
 
 ret
 
