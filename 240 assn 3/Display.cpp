@@ -42,7 +42,7 @@ void display_array(double array[], long index)
 {
   for(long i = 0; i < index; i++)
   {
-    printf("%lf", array[i]);
+    printf("%5.8lf", array[i]);
     printf("%s", " ");        //print out numbers seperated by a space
   }
   printf("\n");       //returning these new lines but not inside array

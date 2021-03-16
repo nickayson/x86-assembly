@@ -77,9 +77,13 @@ push qword 0
 ;Back up the incoming data
 mov r13, rdi         ;r13 is the array
 mov r14, rsi         ;r14 is the max number allowed in the array
-
-;Initialize the loop that will place doubles into the array and count them at the same time
 mov r15, 0           ;r15 is the loop counter and the index into the array
+
+;print the input prompt
+mov rax, 0
+mov rdi, prompt1
+call printf
+
 
 begin_loop:
 cmp r15, r14            ;Check for array may be full.
