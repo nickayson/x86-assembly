@@ -85,9 +85,9 @@ mov rdi, prompt1
 call printf
 
 
-begin_loop:
+begin_loop:		;start loop
 cmp r15, r14            ;Check for array may be full.
-jge outofloop
+jge outofloop		;if r15 is equal to r14 jump to outofloop
 
 ;Input a float number
 mov rax,0
@@ -103,10 +103,10 @@ pop rax
 mov [r13+8*r15],rax
 inc r15
 
-jmp begin_loop
+jmp begin_loop		;jump to the beginning of the loop
 
 
-outofloop:
+outofloop:		;out of the loop
 pop rax
 pop rax
 

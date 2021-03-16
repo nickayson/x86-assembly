@@ -68,11 +68,11 @@ mov r14, rsi                            ; Copies number of elements in the array
 mov r15, 0                             ; Counter to to iterate through array.
 
 mov rax, 0
-cvtsi2sd xmm8, rax                ;1 is now 1.0 in xmm8
+cvtsi2sd xmm8, rax                ;0 in xmm8
 ;=========================================== Start of Loop ==========================================
-begin_loop:
+begin_loop:	;start of the loop
 
-; Compares the counter (r12) to the number of elements in the array (r14).
+; Compares the counter (r15) to the number of elements in the array (r14).
 cmp r15, r14
 jge outofloop
 
@@ -80,7 +80,7 @@ jge outofloop
 ; Adds element of array at index of r12 to the Sum of register r13.
 movsd xmm9, [r13 + 8 * r15]
 addsd xmm8, xmm9
-inc r15                                ; Increments counter r12 by 1.
+inc r15                                ; Increments counter r15 by 1.
 
 ; Restarts loop
 jmp begin_loop

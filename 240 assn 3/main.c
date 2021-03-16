@@ -43,10 +43,12 @@ extern double control();
 int main(int argc, char* argv[])
 {
   double answer = 0.0;
+  //Beginnning statements
  printf("Welcome to High Speed Array Summation by Nicholas Ayson.\n");
  printf("Software Licensed by GNU GPL 3.0\n");
  printf("Version 1.0 released on January 28, 2021.\n");
- answer = control();
+ answer = control();	//gets answer from control
+ //ending statements
  printf("The main driver received %5.8lf and has decided to keep it.\n", answer);
  printf("Thank you for using High Speed Array Software.\n");
  printf("For system support contact Nicholas Ayson at nick.ayson@csu.fullerton.edu.\n");
