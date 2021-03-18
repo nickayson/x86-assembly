@@ -19,12 +19,12 @@
 ;  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY  *
 ;  without even the implied Warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. *
 ;  See the GNU General Public License for more details. A copy of the GNU General Public     *
-; License v3 is available here:  <https://www.gnu.org/licenses/>.                            
-;                                                                                            
+; License v3 is available here:  <https://www.gnu.org/licenses/>.
+;
 ;********************************************************************************************
 ; Program information                                                                       *
 ;   Program name: Sum of Floats - Array                                                     *
-; Programming languages: One module in C, Three modules in X86, One modules in c++          
+; Programming languages: One module in C, Three modules in X86, One modules in c++
 ;   Files in this program: control.asm, Fill.asm, Sum.asm, main.c, Display.cpp              *
 ;                                                                                           *
 ;********************************************************************************************
@@ -34,10 +34,8 @@
 ;                                                                                           *
 ;******************************************************************************************
 
-
-
-
-max_array_size equ 20                           ;max array size is 20
+max_array_size equ 20                         ;max array size is 20 so numbers cannot be more than 20
+                                              ;if entered more will still print out numbers up to the 20th float number and no more
 
 global control
 
@@ -61,7 +59,7 @@ good_bye db "The control module will now return the sum to the caller module.", 
 
 segment .bss
 
-standard_array resq max_array_size
+standard_array resq 20                     ; max array size is 20 so numbers cannot be more than 20
 
 segment .text
 
@@ -91,6 +89,7 @@ mov rax, 0
 mov rdi, welcome               ;"Welcome to HSAS. The accuracy and reliability of this program is guaranteed by Nicholas Ayson."
 call printf
 ;==================================================Filling the array========================================
+
 ;Begin preparation for calling input_array
 mov rax,0
 mov rdi, standard_array
@@ -108,6 +107,7 @@ call printf
 pop rax
 
 ;==============================================Display numbers in the array=====================================
+
 ;Begin preparation for calling output_array
 mov rax, 0
 mov rdi, standard_array

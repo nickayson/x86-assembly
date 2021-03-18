@@ -86,8 +86,6 @@ call printf
 
 
 begin_loop:		;start loop
-cmp r15, r14            ;Check for array may be full.
-jge outofloop		;if r15 is equal to r14 jump to outofloop
 
 ;Input a float number
 mov rax,0
@@ -97,20 +95,25 @@ mov rsi, rsp
 call scanf
 
 ;Check for possible cntl+D
-cmp eax,-1
+cdqe      ;signal in rax
+cmp rax,-1
 je outofloop
 pop rax
+
 mov [r13+8*r15],rax
 inc r15
 
-jmp begin_loop		;jump to the beginning of the loop
+cmp r15, r14            ;Check for array may be full.
+jge exit		;if r15 is equal to r14 jump to exit
 
+jmp begin_loop		;jump to the beginning of the loop
 
 outofloop:		;out of the loop
 pop rax
-pop rax
 
 ;Return the number of values entered into the array
+exit:
+pop rax
 mov rax, r15
 
 ;===========================Exit==========================================================================
