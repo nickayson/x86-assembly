@@ -1,27 +1,3 @@
-b main
-b interview
-b interview.asm:109
-b 63
-b 84
-i b
-r
-c
 Chris Sawyer
-500500
-p/x $rbp
-p/x $rsp
-x/34xg $rsp
-x/f $rsp
-p/f salary
-c
-c
+500500.50
 y
-p/x $rbp
-p/x $rsp
-x/x $rbp-1
-p/c $rax
-c
-p/f offer
-p/x $rbp
-p/x $rsp
-p/x $rip

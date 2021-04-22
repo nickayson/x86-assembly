@@ -1,3 +1,41 @@
+;********************************************************************************************
+; Program name:          interview                                                          *
+; Programming Language:  x86 Assembly                                                       *
+; Program Description:   This program asks a user to play the role of an interviewee asking for salary*
+;                       returns the salary the company is willing to give.                   *
+; Built on: Tuffix 2020
+;                                                                                            *
+; ********************************************************************************************
+;  Author Information:                                                                       *
+;  Name:         Nicholas Ayson                                                              *
+;  Email:        nick.ayson@csu.fullerton.edu                                                *
+;  Institution:  California State University - Fullerton                                     *
+;  Course:       CPSC 240-05 Assembly Language                                               *
+;                                                                                            *
+; ********************************************************************************************
+;  Copyright (C) 2020 Nicholas Ayson                                                         *
+;  This program is free software: you can redistribute it and/or modify it under the terms   *
+;  of the GNU General Public License version 3 as published by the Free Software Foundation. *
+;  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY  *
+;  without even the implied Warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. *
+;  See the GNU General Public License for more details. A copy of the GNU General Public     *
+;  License v3 is available here:  <https://www.gnu.org/licenses/>.                           *
+;                                                                                            *
+; ********************************************************************************************
+;  Program information                                                                       *
+;    Program name: interview                                                                 *
+;    Programming languages: One module in C++, One in asm, three txt files                   *
+;    Files in this program: interview.asm, main.cpp, chris.txt, csmajor.txt,social.txt       *
+;                                                                                            *
+; ********************************************************************************************
+;  This File                                                                                 *
+;     Name:     interview.asm                                                                *
+;     Purpose:   displays and accepts the values of salary, comsci major and name            *
+;                   Later called on to display offer willing to give by company             *
+;                                                                                            *
+; ********************************************************************************************
+
+
 extern printf
 extern scanf
 
@@ -12,12 +50,12 @@ welcome db "Hello %s. I am Ms Fenster. The interview will begin now.", 10, 0    
 salary db "Wow! $%1.2lf That's a lot of cash. Who do you think you are, Chris Sawyer (y or n)?", 10, 0      ; Salary Message
 circuit db "Alright. Now we will work on your electricity.", 10, 0                                          ; Circuit Test Message
 
-circuitQuestion1 db "Please enter the resistance of circuit #1 in ohms: ", 0                                  ; Circuit Question 1
-circuitQuestion2 db "What is the resistance of circuit #2 in ohms: ", 0                                       ; Circuit Question 2
+circuit1 db "Please enter the resistance of circuit #1 in ohms: ", 0                                  ; Circuit Question 1
+circuit2 db "What is the resistance of circuit #2 in ohms: ", 0                                       ; Circuit Question 2
 
 circuitDone db "The total resistance is %1.3lf Ohms.", 10, 0                                                  ; Resistance message
 
-compSciQuestion db "Were you a computer science major (y or n)? ", 0                                          ; Comp Sci Major Question
+comsci db "Were you a computer science major (y or n)? ", 0                                          ; Comp Sci Major Question
 bye db "Thank you.  Please follow the exit signs to the front desk.", 10, 0                            ; Bye Message
 
 section .bss
@@ -94,7 +132,7 @@ pop rax
 ;Ask first question==================================================================================
 push qword 0
 mov rax, 0
-mov rdi, circuitQuestion1       ;"Please enter the resistance of circuit #1 in ohms: "
+mov rdi, circuit1       ;"Please enter the resistance of circuit #1 in ohms: "
 call printf
 pop rax
 
@@ -110,7 +148,7 @@ pop rax
 ;Ask second question ==================================================================================
 push qword 0
 mov rax, 0
-mov rdi, circuitQuestion2     ;"What is the resistance of circuit #2 in ohms:
+mov rdi, circuit2     ;"What is the resistance of circuit #2 in ohms:
 call printf
 pop rax
 
@@ -124,7 +162,7 @@ movsd xmm11, [rsp]  ;second input float now in xmm11
 pop rax
 
 ;Get the inverse of the resistances ===================================================================
-mov r8, 1     ;r8 = 1
+mov r8, 1               ;r8 = 1
 cvtsi2sd xmm8, r8       ;xmm8=1
 divsd xmm8, xmm10       ; xmm8 = xmm8/xmm10          ex: 1/8
 movsd xmm10, xmm8       ; xmm10 = xmm8
@@ -148,7 +186,7 @@ movsd xmm13, xmm8   ;xmm13 = xmm8
 ; Print out circuitDone message =======================================================================
 push qword 0
 mov rax, 1
-mov rdi, circuitDone      ;"The total resistance is %1.3lf Ohms."
+mov rdi, circuit     ;"The total resistance is %1.3lf Ohms."
 movsd xmm0, xmm13
 call printf
 pop rax
@@ -156,7 +194,7 @@ pop rax
 ; Ask if CS Major?======================================================================================
 push qword 0
 mov rax, 0
-mov rdi, compSciQuestion
+mov rdi, comsci
 call printf
 pop rax
 
@@ -181,7 +219,7 @@ movq xmm14, rax               ; Put 88000.88 into xmm14
 
 ;===================================================================================================
 end:
-; Bye Message
+;Bye Message
 push qword 0
 mov rax, 0
 mov rdi, bye
