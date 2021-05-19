@@ -35,6 +35,11 @@
 ;                                                                                            *
 ; ********************************************************************************************
 
+; run with:
+; sh r.sh < chris.txt
+; sh r.sh < csmajor.txt
+; sh r.sh < social.txt
+
 
 extern printf
 extern scanf
@@ -186,7 +191,7 @@ movsd xmm13, xmm8   ;xmm13 = xmm8
 ; Print out circuitDone message =======================================================================
 push qword 0
 mov rax, 1
-mov rdi, circuit     ;"The total resistance is %1.3lf Ohms."
+mov rdi, circuitDone    ;"The total resistance is %1.3lf Ohms."
 movsd xmm0, xmm13
 call printf
 pop rax
