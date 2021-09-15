@@ -1,0 +1,135 @@
+     1                                  extern printf
+     2                                  extern scanf
+     3                                  extern control
+     4                                  global fill
+     5                                  
+     6                                  segment .data
+     7                                  
+     8 00000000 506C6561736520656E-     prompt1 db "Please enter floating point numbers separated by ws.",10,0
+     8 00000009 74657220666C6F6174-
+     8 00000012 696E6720706F696E74-
+     8 0000001B 206E756D6265727320-
+     8 00000024 736570617261746564-
+     8 0000002D 2062792077732E0A00 
+     9                                  
+    10 00000036 5768656E2066696E69-     prompt2 db "When finished press enter followed by cntl+D.",10,0
+    10 0000003F 736865642070726573-
+    10 00000048 7320656E7465722066-
+    10 00000051 6F6C6C6F7765642062-
+    10 0000005A 7920636E746C2B442E-
+    10 00000063 0A00               
+    11                                  
+    12 00000065 256C6600                floatformat db "%lf",0
+    13                                  
+    14                                  
+    15                                  
+    16                                  
+    17                                  segment .bss
+    18                                  
+    19                                  segment .text
+    20                                  
+    21                                  fill:
+    22                                  
+    23                                  ;=============================================================================================
+    24 00000000 55                      push rbp
+    25 00000001 4889E5                  mov  rbp,rsp
+    26 00000004 57                      push rdi                                                    ;Backup rdi
+    27 00000005 56                      push rsi                                                    ;Backup rsi
+    28 00000006 52                      push rdx                                                    ;Backup rdx
+    29 00000007 51                      push rcx                                                    ;Backup rcx
+    30 00000008 4150                    push r8                                                     ;Backup r8
+    31 0000000A 4151                    push r9                                                     ;Backup r9
+    32 0000000C 4152                    push r10                                                    ;Backup r10
+    33 0000000E 4153                    push r11                                                    ;Backup r11
+    34 00000010 4154                    push r12                                                    ;Backup r12
+    35 00000012 4155                    push r13                                                    ;Backup r13
+    36 00000014 4156                    push r14                                                    ;Backup r14
+    37 00000016 4157                    push r15                                                    ;Backup r15
+    38 00000018 53                      push rbx                                                    ;Backup rbx
+    39 00000019 9C                      pushf
+    40                                  
+    41 0000001A 6A00                    push qword 0
+    42                                  
+    43                                  
+    44                                  ;Initialize the parameters
+    45 0000001C 4989FF                  mov r15, rdi      ;r15 is the array
+    46 0000001F 4989F6                  mov r14, rsi      ;r14 is maximum amount of elements in array
+    47 00000022 41BD00000000            mov r13, 0        ;set counter to 0
+    48                                  
+    49                                  ;====================Prompt 1  and 2 Display===============================================================
+    50                                  
+    51 00000028 6A00                    push qword 0
+    52 0000002A B800000000              mov rax, 0
+    53 0000002F 48BF-                   mov rdi, prompt1          ;"Please enter floating point numbers separated by ws."
+    53 00000031 [0000000000000000] 
+    54 00000039 E8(00000000)            call printf
+    55 0000003E 58                      pop rax
+    56                                  
+    57 0000003F 6A00                    push qword 0
+    58 00000041 B800000000              mov rax, 0
+    59 00000046 48BF-                   mov rdi, prompt2          ;"When finished press enter followed by cntl+D."
+    59 00000048 [3600000000000000] 
+    60 00000050 E8(00000000)            call printf
+    61 00000055 58                      pop rax
+    62                                  
+    63                                  ;========================Begin Loop===========================================================
+    64                                  
+    65                                  begin_loop:       ;begins to fill the loop
+    66                                  
+    67                                  ;Scanf funtion to take the user input
+    68 00000056 B800000000              mov rax, 0
+    69 0000005B 48BF-                   mov rdi, floatformat
+    69 0000005D [6500000000000000] 
+    70                                  
+    71 00000065 6A00                    push qword 0
+    72 00000067 B800000000              mov rax, 0
+    73 0000006C 4889E6                  mov rsi, rsp
+    74 0000006F E8(00000000)            call scanf
+    75 00000074 58                      pop rax
+    76                                  
+    77                                  ;tests to see if cntl d is pushed
+    78 00000075 4898                    cdqe
+    79 00000077 4883F8FF                cmp rax, -1
+    80 0000007B 740E                    je end_of_loop          ;if cntl d is entered exit the loop
+    81                                  
+    82                                  ;input in r12
+    83 0000007D 4F8924EF                mov [r15 + 8 *r13], r12         ;copies user input into array at index of r13
+    84 00000081 49FFC5                  inc r13                         ;increments r13 by 1.
+    85                                  
+    86                                  ;check to see if aren't adding outside the loop
+    87 00000084 4D39F5                  cmp r13, r14          ;r13 = count
+    88 00000087 7407                    je exit               ;r14 = max
+    89                                  
+    90 00000089 EBCB                    jmp begin_loop        ;goes back to beginning
+    91                                  
+    92                                  ;================================End of Loop=========================================================================
+    93                                  
+    94                                  ;after cntl D is entered the loop is skipped to the end
+    95                                  end_of_loop:
+    96 0000008B B80D000000              mov rax, 13
+    97                                  
+    98                                  ;===========================Exit==========================================================================
+    99                                  exit:
+   100 00000090 58                      pop rax
+   101                                  
+   102                                  ;restores all backed up registers to original
+   103 00000091 9D                      popf                                                        ;Restore rflags
+   104 00000092 5B                      pop rbx                                                     ;Restore rbx
+   105 00000093 415F                    pop r15                                                     ;Restore r15
+   106 00000095 415E                    pop r14                                                     ;Restore r14
+   107 00000097 415D                    pop r13                                                     ;Restore r13
+   108 00000099 415C                    pop r12                                                     ;Restore r12
+   109 0000009B 415B                    pop r11                                                     ;Restore r11
+   110 0000009D 415A                    pop r10                                                     ;Restore r10
+   111 0000009F 4159                    pop r9                                                      ;Restore r9
+   112 000000A1 4158                    pop r8                                                      ;Restore r8
+   113 000000A3 59                      pop rcx                                                     ;Restore rcx
+   114 000000A4 5A                      pop rdx                                                     ;Restore rdx
+   115 000000A5 5E                      pop rsi                                                     ;Restore rsi
+   116 000000A6 5F                      pop rdi                                                     ;Restore rdi
+   117 000000A7 5D                      pop rbp                                                     ;Restore rbp
+   118                                  
+   119                                  
+   120 000000A8 C3                      ret
+   121                                  
+   122                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
